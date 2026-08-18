@@ -19,13 +19,39 @@ function createCodeChallenge(verifier) {
     .digest("base64url");
 }
 
-// Step 1: Start Salesforce OAuth Authorization Code + PKCE flow.
+function getCookie(req, name) {
+  const cookies = req.headers.cookie || "";
+
+  const match = cookies
+    .split(";")
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith(`${name}=`));
+
+  return match ? decodeURIComponent(match.substring(name.length + 1)) : null;
+}
+
+function setPkceCookie(res, verifier) {
+  res.setHeader(
+    "Set-Cookie",
+    `pkce_verifier=${encodeURIComponent(verifier)}; Path=/auth; HttpOnly; Secure; SameSite=Lax; Max-Age=600`
+  );
+}
+
+function clearPkceCookie(res) {
+  res.setHeader(
+    "Set-Cookie",
+    "pkce_verifier=; Path=/auth; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
+  );
+}
+
+// Start Salesforce OAuth Authorization Code + PKCE flow.
 router.get("/login", (req, res) => {
   const codeVerifier = createCodeVerifier();
   const codeChallenge = createCodeChallenge(codeVerifier);
 
-  // Keep the verifier server-side. It must never be exposed to the browser.
-  req.session.pkceVerifier = codeVerifier;
+  // Store verifier in an HTTP-only cookie because Vercel
+  // serverless instances do not guarantee the same session instance.
+  setPkceCookie(res, codeVerifier);
 
   const params = new URLSearchParams({
     response_type: "code",
@@ -42,17 +68,17 @@ router.get("/login", (req, res) => {
   res.redirect(authUrl);
 });
 
-// Step 2: Salesforce redirects back with the authorization code.
+// Salesforce OAuth callback.
 router.get("/callback", async (req, res) => {
   const { code } = req.query;
-  const codeVerifier = req.session.pkceVerifier;
+  const codeVerifier = getCookie(req, "pkce_verifier");
 
   if (!code) {
     return res.status(400).send("Missing authorization code from Salesforce.");
   }
 
   if (!codeVerifier) {
-    return res.status(400).send("Missing PKCE verifier from session.");
+    return res.status(400).send("Missing PKCE verifier cookie.");
   }
 
   try {
@@ -98,17 +124,16 @@ router.get("/callback", async (req, res) => {
       organizationId: userInfo.organization_id,
     };
 
-    // PKCE verifier is no longer needed.
-    delete req.session.pkceVerifier;
+    clearPkceCookie(res);
 
     res.redirect(`${process.env.FRONTEND_URL}?login=success`);
   } catch (err) {
     console.error("OAuth callback error:", err);
+    clearPkceCookie(res);
     res.redirect(`${process.env.FRONTEND_URL}?login=error`);
   }
 });
 
-// Lets the frontend check whether the user is logged in.
 router.get("/me", (req, res) => {
   if (req.session.sf) {
     return res.json({
@@ -120,7 +145,6 @@ router.get("/me", (req, res) => {
   res.json({ loggedIn: false });
 });
 
-// Logout.
 router.post("/logout", (req, res) => {
   req.session.destroy(() => {
     res.json({ loggedOut: true });
