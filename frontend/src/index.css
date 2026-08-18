@@ -234,13 +234,14 @@ button, input, select, textarea {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
-  overflow: hidden;
   max-height: 65vh;
+  overflow-x: auto;
   overflow-y: auto;
 }
 
 table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   font-family: var(--font-mono);
   font-size: 13px;
