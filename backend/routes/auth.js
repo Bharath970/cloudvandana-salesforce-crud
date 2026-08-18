@@ -2,6 +2,11 @@ const express = require("express");
 const jsforce = require("jsforce");
 const crypto = require("crypto");
 
+const {
+  setAuthCookie,
+  clearAuthCookie,
+} = require("../authCookie");
+
 const router = express.Router();
 
 function getLoginUrl() {
@@ -27,7 +32,9 @@ function getCookie(req, name) {
     .map((cookie) => cookie.trim())
     .find((cookie) => cookie.startsWith(`${name}=`));
 
-  return match ? decodeURIComponent(match.substring(name.length + 1)) : null;
+  return match
+    ? decodeURIComponent(match.substring(name.length + 1))
+    : null;
 }
 
 function setPkceCookie(res, verifier) {
@@ -38,10 +45,19 @@ function setPkceCookie(res, verifier) {
 }
 
 function clearPkceCookie(res) {
-  res.setHeader(
-    "Set-Cookie",
-    "pkce_verifier=; Path=/auth; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
-  );
+  const cookie =
+    "pkce_verifier=; Path=/auth; HttpOnly; Secure; SameSite=Lax; Max-Age=0";
+
+  const existing = res.getHeader("Set-Cookie");
+
+  if (existing) {
+    res.setHeader("Set-Cookie", [
+      ...(Array.isArray(existing) ? existing : [existing]),
+      cookie,
+    ]);
+  } else {
+    res.setHeader("Set-Cookie", cookie);
+  }
 }
 
 // Start Salesforce OAuth Authorization Code + PKCE flow.
@@ -49,8 +65,6 @@ router.get("/login", (req, res) => {
   const codeVerifier = createCodeVerifier();
   const codeChallenge = createCodeChallenge(codeVerifier);
 
-  // Store verifier in an HTTP-only cookie because Vercel
-  // serverless instances do not guarantee the same session instance.
   setPkceCookie(res, codeVerifier);
 
   const params = new URLSearchParams({
@@ -116,7 +130,7 @@ router.get("/callback", async (req, res) => {
 
     const userInfo = await conn.identity();
 
-    req.session.sf = {
+    const authData = {
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
       instanceUrl: tokenData.instance_url,
@@ -124,6 +138,13 @@ router.get("/callback", async (req, res) => {
       organizationId: userInfo.organization_id,
     };
 
+    // Keep the existing session for compatibility.
+    req.session.sf = authData;
+
+    // Persist authentication across Vercel serverless instances.
+    setAuthCookie(res, authData);
+
+    // PKCE verifier is no longer needed.
     clearPkceCookie(res);
 
     res.redirect(`${process.env.FRONTEND_URL}?login=success`);
@@ -146,6 +167,9 @@ router.get("/me", (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
+  clearAuthCookie(res);
+  clearPkceCookie(res);
+
   req.session.destroy(() => {
     res.json({ loggedOut: true });
   });
