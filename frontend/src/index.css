@@ -1,0 +1,359 @@
+:root {
+  --ink: #10181f;
+  --slate: #4a5a68;
+  --paper: #f6f8fa;
+  --panel: #ffffff;
+  --line: #dde3e8;
+  --accent: #2f6fed;
+  --accent-dark: #1d4fc0;
+  --danger: #d1453b;
+  --success: #1f8a5f;
+  --font-ui: "Inter", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* ---------- Login ---------- */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 20%, #eef3ff 0%, var(--paper) 55%);
+}
+
+.login-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 20px 40px -20px rgba(16, 24, 31, 0.15);
+}
+
+.login-mark {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 20px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+}
+
+.login-card h1 {
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+
+.login-sub {
+  color: var(--slate);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+.login-error {
+  color: var(--danger);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+}
+
+.login-footnote {
+  margin-top: 18px;
+  font-size: 12px;
+  color: #8a97a3;
+}
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--slate);
+}
+
+/* ---------- App shell ---------- */
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.object-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.object-selector label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--slate);
+}
+
+.object-selector select {
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  min-width: 220px;
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-dark);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 15px;
+  cursor: pointer;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 13px;
+}
+
+.btn-danger {
+  color: var(--danger);
+}
+
+/* ---------- Banner ---------- */
+.banner {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.banner-success {
+  background: #e5f6ee;
+  color: var(--success);
+}
+
+.banner-error {
+  background: #fbeae9;
+  color: var(--danger);
+}
+
+/* ---------- Table ---------- */
+.table-scroll {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: #f0f3f6;
+  text-align: left;
+  padding: 10px 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate);
+  border-bottom: 1px solid var(--line);
+}
+
+tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+tbody tr:hover {
+  background: #fafbfc;
+}
+
+.actions-col {
+  white-space: nowrap;
+  font-family: var(--font-ui);
+}
+
+.scroll-sentinel {
+  text-align: center;
+  padding: 14px;
+  font-size: 12px;
+  color: var(--slate);
+}
+
+.empty-state {
+  padding: 48px;
+  text-align: center;
+  color: var(--slate);
+  background: var(--panel);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+}
+
+/* ---------- Modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 31, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 20;
+}
+
+.modal-card {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 28px;
+  width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal-card h2 {
+  margin: 0 0 18px;
+  font-size: 18px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-row label {
+  font-size: 12px;
+  color: var(--slate);
+}
+
+.required-mark {
+  color: var(--danger);
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 13px;
+  margin: -4px 0 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
